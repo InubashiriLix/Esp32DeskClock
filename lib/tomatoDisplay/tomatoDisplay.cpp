@@ -2,14 +2,15 @@
 #include <tomatoDisplay.hpp>
 #include <oled.hpp>
 #include <timeDisplay.hpp>
+#include "buzzer.hpp"
 
 volatile tomatoStatus_e tomatoStatus = tomatoStatus_e::STOPPED;
 volatile bool time_up = false;
 volatile int  tomato_cmp_cnt = 0;
 
 // 25 分钟工作；5 分钟休息
-static const int TOMATO_WORK_MIN = 25;
-static const int TOMATO_BREAK_MIN = 5;
+static const int TOMATO_WORK_MIN = 1;
+static const int TOMATO_BREAK_MIN = 1;
 
 int tomato_minute = TOMATO_WORK_MIN;
 int tomato_second = 0;
@@ -35,16 +36,14 @@ void tomatoTimerTask(void *pvParameters)
         switch (tomatoStatus)
         {
         case tomatoStatus_e::STOPPED:
-            // 什么也不做
             break;
 
         case tomatoStatus_e::RUNNING:
-            // 倒计时
             if (tomato_second == 0)
             {
                 if (tomato_minute == 0)
                 {
-                    // 工作结束，进入休息
+                    buzzer_shout_mode = shout_type::three_buzz;
                     time_up = true;
                     tomatoStatus = tomatoStatus_e::RELAXATION;
                     tomato_cmp_cnt++;
@@ -70,6 +69,7 @@ void tomatoTimerTask(void *pvParameters)
             {
                 if (tomato_minute == 0)
                 {
+                    buzzer_shout_mode = shout_type::four_buzz;
                     // 休息结束，停止并重置
                     Serial.println("[Tomato] Break over! Resetting");
                     tomatoStatus = tomatoStatus_e::STOPPED;
