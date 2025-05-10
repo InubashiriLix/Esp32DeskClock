@@ -3,6 +3,10 @@
 #include <dht.hpp>
 #include <bmp280.hpp>
 
+#include <weather.hpp>
+
+extern WeatherInfo weather;
+
 void envDisplayTask(void *pvParameters)
 {
   for (;;)
@@ -13,9 +17,11 @@ void envDisplayTask(void *pvParameters)
       display.setTextSize(1);
       display.setCursor(0, 0);
       display.printf("Enviroment Info\n");
-      display.setCursor(0, 8);
-      display.printf(String(dhtSuccess ? "dht: OK" : "dht: FAIL").c_str());
-      display.setCursor(64, 8);
+      // NOTE: dht not supportted now
+      // display.setCursor(0, 8);
+      // display.printf(String(dhtSuccess ? "dht: OK" : "dht: FAIL").c_str());
+      // display.setCursor(64, 8);
+      // display.setCursor(0, 8);
       display.printf("bmp: %s\n", bmp280Init ? "OK" : "FAIL");
 
       // dht not avaliable not
@@ -31,7 +37,7 @@ void envDisplayTask(void *pvParameters)
       display.setCursor(0, 32);
       display.printf("Alti: %.1f %%\n", bmp280Altitude);
       display.setCursor(64, 32);
-      display.printf("H: %.1f %%\n", dht_humi);
+      display.printf("H: %.1f %%\n", weather.humidity);
       display.display();
     }
     vTaskDelay(200 / portTICK_PERIOD_MS);
