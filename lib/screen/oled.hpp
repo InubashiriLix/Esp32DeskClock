@@ -15,7 +15,9 @@ enum class DISPLAY_MODE
   WEATHER_2,
   ENVIRONMENT,
   TOMATO_CLOCK,
+  CONFIG_PAGE,
   COUNT,
+  ITR_CLOCK_TIME_UP, // shit mode
 };
 
 extern DISPLAY_MODE currDispMode ;
