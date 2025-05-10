@@ -20,7 +20,6 @@ void updateWeatherTask(void *pvParameters)
 
   for (;;)
   {
-    // —— 1. 检查 WiFi —— 
     if (WiFi.status() != WL_CONNECTED)
     {
       weatherUpdateStatus = weatherUpdateStatus_t::WIFI_DISCONNECTED;
@@ -29,7 +28,6 @@ void updateWeatherTask(void *pvParameters)
       continue;
     }
 
-    // —— 2. 发起 HTTP GET —— 
     HTTPClient http;
     Serial.println("[Weather] sending HTTP GET request...");
     http.begin(weather_url.c_str());
@@ -46,14 +44,12 @@ void updateWeatherTask(void *pvParameters)
       continue;
     }
 
-    // —— 3. 读取 Payload —— 
     String payload = http.getString();
     http.end();
     Serial.printf("[Weather] Payload len: %u bytes\n", payload.length());
     Serial.println("[Weather] Payload 200 cahrs");
     Serial.println(payload.substring(0, min((int)payload.length(), 200)));
 
-    // —— 4. 解析 JSON —— 
     StaticJsonDocument<2048> doc;
     DeserializationError err = deserializeJson(doc, payload);
     if (err)
@@ -65,7 +61,6 @@ void updateWeatherTask(void *pvParameters)
     }
     Serial.println("[Weather] json parse success");
 
-    // —— 5. 完整字段提取 —— 
     // coord
     weather.coord_lon = doc["coord"]["lon"].as<float>();
     weather.coord_lat = doc["coord"]["lat"].as<float>();
