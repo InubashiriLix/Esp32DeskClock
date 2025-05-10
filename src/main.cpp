@@ -18,11 +18,14 @@
 #include "tomatoDisplay.hpp"
 #include "bmp280.hpp"
 #include "rgb.hpp"
+#include "buzzer.hpp"
+#include "config_display.hpp"
+#include "clock_time_task.hpp"
 
 // If your module has no reset pin wired, pass -1 as the last arg:
 
-const char *ssid = "your_ssid";
-const char *password = "your_password";
+const char *ssid = "GMaster";
+const char *password = "35086020";
 
 void wifiSetup()
 {
@@ -70,7 +73,7 @@ void wifiSetup()
 
   Serial.println("Connected to WiFi!");
   display.clearDisplay();
-  display.setCursor(0, 10);
+  display.setCursor(0, 0);
   display.setTextSize(2);
   display.printf("WIFI DONE");
   display.display();
@@ -90,9 +93,11 @@ void setup()
   Serial.begin(115200);
 
   pinSetup();
+  buzzer_setup();
   boardLedSetup();
   rgbSetup();
   dhtSetup();
+  clockInital();
   bmp280Setup();
 
   oledSetup();
@@ -106,12 +111,12 @@ void setup()
 
   xTaskCreate(bmp280UpdateTask, "bmp280 update", 2048, NULL, 1, NULL);
 
-  xTaskCreate(modeChangeTask, "mode change", 1024, NULL, 1, NULL);  
+  xTaskCreate(modeChangeTask, "mode change", 4096, NULL, 1, NULL);  
 
   xTaskCreate(updateDateTimeItqTask, "update time", 2048, NULL, 1, NULL);
   xTaskCreate(displayTimeTask, "DisplayTime", 2048, NULL, 1, NULL);
 
-  xTaskCreate(updateWeatherTask, "update weather", 4096, NULL, 1, NULL);
+  xTaskCreate(updateWeatherTask, "update weather", 8192, NULL, 1, NULL);
   xTaskCreate(updateWeatherDisplayTask, "update weather display", 2048, NULL, 1, NULL);
 
   xTaskCreate(envDisplayTask, "env display", 2048, NULL, 1, NULL);
@@ -119,6 +124,13 @@ void setup()
   xTaskCreate(tomatoTimerTask, "tomato timer", 2048, NULL, 1, NULL);
   xTaskCreate(tomatoDisplayTask, "tomato display", 2048, NULL, 1, NULL);
 
+  xTaskCreate(runBuzzerTask, "run Buzzer task", 2048, NULL, 1, NULL);
+
+  xTaskCreate(ClockMonitorTask, "Clock monitor task", 2048, NULL, 1, NULL);
+
+  xTaskCreate(dispalyConfigPageTask, "display config page task", 2048, NULL, 1, NULL);
+
+  xTaskCreate(ClockTimeUpItrDisplayTask, "Clock time up display", 2048, NULL, 1, NULL);
 }
 
 void loop()
